@@ -30,6 +30,15 @@ class Badge(object):
         asynchronous it just queues up the badge awarding.
         """
         assert "user" in state
+
+        try:
+            user_id = state['user'].pk
+        except AttributeError:
+            user_id = state['user']
+
+        state['user_id'] = user_id
+        del state['user']
+
         if self.async:
             from brabeion.tasks import AsyncBadgeAward
             state = self.freeze(**state)
@@ -41,13 +50,13 @@ class Badge(object):
         """
         Does the actual work of possibly awarding a badge.
         """
-        user = state["user"]
+        user_id = state["user_id"]
         force_timestamp = state.pop("force_timestamp", None)
         awarded = self.award(**state)
         if awarded is None:
             return
         if awarded.user is not None:
-            user = awarded.user
+            user_id = awarded.user.pk
         if awarded.level is None:
             assert len(self.levels) == 1
             awarded.level = 1
@@ -55,12 +64,12 @@ class Badge(object):
         awarded = awarded.level - 1
         assert awarded < len(self.levels)
         if (not self.multiple and
-            BadgeAward.objects.filter(user=user, slug=self.slug, level=awarded)):
+            BadgeAward.objects.filter(user__pk=user_id, slug=self.slug, level=awarded)):
             return
         extra_kwargs = {}
         if force_timestamp is not None:
             extra_kwargs["awarded_at"] = force_timestamp
-        badge = BadgeAward.objects.create(user=user, slug=self.slug,
+        badge = BadgeAward.objects.create(user_id=user_id, slug=self.slug,
             level=awarded, **extra_kwargs)
         badge_awarded.send(sender=self, badge_award=badge)
     
