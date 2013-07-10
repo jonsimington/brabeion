@@ -1,14 +1,14 @@
-from datetime import datetime
-
 from django.db import models
 
 from django.conf import settings
+
+from django.utils import timezone
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 class BadgeAward(models.Model):
     user = models.ForeignKey(AUTH_USER_MODEL, related_name="badges_earned")
-    awarded_at = models.DateTimeField(default=datetime.now)
+    awarded_at = models.DateTimeField(default=timezone.now)
     slug = models.CharField(max_length=255)
     level = models.IntegerField()
     
