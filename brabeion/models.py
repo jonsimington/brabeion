@@ -12,6 +12,9 @@ class BadgeAward(models.Model):
     slug = models.CharField(max_length=255)
     level = models.IntegerField()
     
+    def __unicode__(self):
+        return u'%s (%s) awarded to %s' % (self.slug, self.level, self.user)
+
     def __getattr__(self, attr):
         return getattr(self._badge, attr)
     
