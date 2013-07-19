@@ -14,6 +14,9 @@ class BadgeDetail(object):
         self.name = name
         self.description = description
 
+    def __repr__(self):
+        return unicode(self.name)
+
 
 class Badge(object):
     async = False
