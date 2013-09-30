@@ -4,8 +4,8 @@ from django.db import connection
 from django.test import TestCase
 
 from brabeion import badges
-from brabeion.base import Badge, BadgeAwarded
-from brabeion.tests.models import PlayerStat
+from .base import Badge, BadgeAwarded
+from .tests.models import PlayerStat
 
 
 class PointsBadge(Badge):

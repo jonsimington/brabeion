@@ -1,1 +1,1 @@
-from brabeion.tests.tests import BadgesTests
+from .tests.tests import BadgesTests

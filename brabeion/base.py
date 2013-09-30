@@ -1,5 +1,5 @@
-from brabeion.models import BadgeAward
-from brabeion.signals import badge_awarded
+from .models import BadgeAward
+from .signals import badge_awarded
 
 
 
@@ -43,7 +43,7 @@ class Badge(object):
         del state['user']
 
         if self.async:
-            from brabeion.tasks import AsyncBadgeAward
+            from .tasks import AsyncBadgeAward
             state = self.freeze(**state)
             AsyncBadgeAward.delay(self, state)
             return
