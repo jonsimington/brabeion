@@ -1,6 +1,6 @@
 from django import template
 
-from .models import BadgeAward
+from ..models import BadgeAward
 
 
 register = template.Library()
@@ -49,22 +49,28 @@ class BadgesForUserNode(template.Node):
     @classmethod
     def handle_token(cls, parser, token):
         bits = token.split_contents()
-        if len(bits) != 4:
-            raise template.TemplateSyntaxError("%r takes exactly 3 arguments." % bits[0])
-        if bits[2] != "as":
-            raise template.TemplateSyntaxError("The 2nd argument to %r should "
+        if len(bits) != 5:
+            raise template.TemplateSyntaxError("%r takes exactly 4 arguments." % bits[0])
+        if not (bits[2][0] in ('"', "'") and bits[2][-1] == bits[2][0]):
+            raise template.TemplateSyntaxError("%r expects 2nd argument format to be '\"string\"'" % bits[0])
+        if bits[3] != "as":
+            raise template.TemplateSyntaxError("The 3rd argument to %r should "
                 "be 'as'" % bits[0])
-        return cls(bits[1], bits[3])
+        return cls(bits[1], bits[2][1:-1], bits[4])
     
-    def __init__(self, user, context_var):
+    def __init__(self, user, slug, context_var):
         self.user = template.Variable(user)
+        self.slug = slug
         self.context_var = context_var
     
     def render(self, context):
         user = self.user.resolve(context)
-        context[self.context_var] = BadgeAward.objects.filter(
-            user=user
-        ).order_by("-awarded_at")
+        slug = self.slug
+
+        filters = {'user': user}
+        if not slug == '':
+            filters.update({'slug': slug})
+        context[self.context_var] = BadgeAward.objects.filter(**filters).order_by("-awarded_at")
         return ""
         
 

@@ -29,11 +29,11 @@ class BadgeAward(models.Model):
     
     @property
     def name(self):
-        return self._badge.levels[self.level].name
+        return self._badge.levels[self.level - 1].name
     
     @property
     def description(self):
-        return self._badge.levels[self.level].description
+        return self._badge.levels[self.level - 1].description
     
     @property
     def progress(self):
