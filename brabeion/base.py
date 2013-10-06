@@ -10,9 +10,10 @@ class BadgeAwarded(object):
 
 
 class BadgeDetail(object):
-    def __init__(self, name=None, description=None):
+    def __init__(self, name=None, description=None, image=None):
         self.name = name
         self.description = description
+        self.image = image
 
     def __repr__(self):
         return unicode(self.name)

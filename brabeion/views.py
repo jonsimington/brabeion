@@ -26,6 +26,7 @@ def badge_list(request):
             "level": badge["level"],
             "name": badges._registry[badge["slug"]].levels[badge["level"]].name,
             "description": badges._registry[badge["slug"]].levels[badge["level"]].description,
+            "image": badges._registry[badge["slug"]].levels[badge["level"]].image,
             "count": badge["num"],
             "user_has": (badge["slug"], badge["level"]) in user_badges
         })
