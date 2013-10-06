@@ -40,5 +40,9 @@ class BadgeAward(models.Model):
         return self._badge.levels[self.level - 1].image
 
     @property
+    def points(self):
+        return self._badge.levels[self.level - 1].points
+
+    @property
     def progress(self):
         return self._badge.progress(self.user, self.level)
