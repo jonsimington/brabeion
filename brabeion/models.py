@@ -44,6 +44,10 @@ class BadgeAward(models.Model):
         return self._badge.levels[self.level - 1].points
 
     @property
+    def points_next(self):
+        return self._badge.levels[self.level - 1].points_next
+
+    @property
     def required_badges(self):
         return self._badge.levels[self.level - 1].required_badges
 
