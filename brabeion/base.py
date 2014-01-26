@@ -10,13 +10,12 @@ class BadgeAwarded(object):
 
 
 class BadgeDetail(object):
-    def __init__(self, name=None, description=None, image=None, points=None, points_next=None, required_badges=None):
+    def __init__(self, name=None, description=None, **kwargs):
         self.name = name
         self.description = description
-        self.image = image
-        self.points = points
-        self.points_next = points_next
-        self.required_badges = required_badges
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def __repr__(self):
         return unicode(self.name)
