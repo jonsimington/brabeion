@@ -37,7 +37,11 @@ class BadgeAward(models.Model):
 
     @property
     def image(self):
-        return self._badge.levels[self.level - 1].image
+        image = self._badge.levels[self.level - 1].image
+        if image != '':
+            return '%sbadges/%s' % (settings.STATIC_URL, self._badge.levels[self.level - 1].image)
+
+        return False
 
     @property
     def points(self):

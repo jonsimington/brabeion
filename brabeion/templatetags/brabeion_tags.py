@@ -68,9 +68,13 @@ class BadgesForUserNode(template.Node):
         slug = self.slug
 
         filters = {'user': user}
+        excludes = {}
         if not slug == '':
-            filters.update({'slug': slug})
-        context[self.context_var] = BadgeAward.objects.filter(**filters).order_by("-awarded_at")
+            if slug.startswith('not_'):
+                excludes.update({'slug': slug.replace('not_', '')})
+            else:
+                filters.update({'slug': slug})
+        context[self.context_var] = BadgeAward.objects.filter(**filters).exclude(**excludes).order_by("-awarded_at")
         return ""
         
 
