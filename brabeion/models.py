@@ -39,7 +39,7 @@ class BadgeAward(models.Model):
     def image(self):
         image = self._badge.levels[self.level - 1].image
         if image != '':
-            return '%sbadges/%s' % (settings.STATIC_URL, self._badge.levels[self.level - 1].image)
+            return '%sbadges/128/%s' % (settings.STATIC_URL, self._badge.levels[self.level - 1].image)
 
         return False
 

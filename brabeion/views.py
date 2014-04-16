@@ -28,11 +28,7 @@ def badge_list(request):
             "description": badges._registry[badge["slug"]].levels[badge["level"]].description,
             "image": badges._registry[badge["slug"]].levels[badge["level"]].image,
             "points": badges._registry[badge["slug"]].levels[badge["level"]].points,
-            "points_next": badges._registry[badge["slug"]].levels[badge["level"]].points_next
-
-
-
-            ,
+            "points_next": badges._registry[badge["slug"]].levels[badge["level"]].points_next,
             "required_badges": badges._registry[badge["slug"]].levels[badge["level"]].required_badges,
             "count": badge["num"],
             "user_has": (badge["slug"], badge["level"]) in user_badges
