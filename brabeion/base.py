@@ -1,5 +1,5 @@
-from .models import BadgeAward
-from .signals import badge_awarded
+from brabeion.models import BadgeAward
+from brabeion.signals import badge_awarded
 
 
 
@@ -10,72 +10,58 @@ class BadgeAwarded(object):
 
 
 class BadgeDetail(object):
-    def __init__(self, name=None, description=None, **kwargs):
+    def __init__(self, name=None, description=None):
         self.name = name
         self.description = description
-
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
-    def __repr__(self):
-        return unicode(self.name)
 
 
 class Badge(object):
     async = False
-    
+
     def __init__(self):
         assert not (self.multiple and len(self.levels) > 1)
         for i, level in enumerate(self.levels):
             if not isinstance(level, BadgeDetail):
                 self.levels[i] = BadgeDetail(level)
-    
+
     def possibly_award(self, **state):
         """
         Will see if the user should be awarded a badge.  If this badge is
         asynchronous it just queues up the badge awarding.
         """
         assert "user" in state
-
-        try:
-            user_id = state['user'].pk
-        except AttributeError:
-            user_id = state['user']
-
-        state['user_id'] = user_id
-        del state['user']
-
         if self.async:
-            from .tasks import AsyncBadgeAward
+            from brabeion.tasks import AsyncBadgeAward
             state = self.freeze(**state)
             AsyncBadgeAward.delay(self, state)
             return
         self.actually_possibly_award(**state)
-    
+
     def actually_possibly_award(self, **state):
         """
         Does the actual work of possibly awarding a badge.
         """
-        user_id = state["user_id"]
+        user = state["user"]
         force_timestamp = state.pop("force_timestamp", None)
         awarded = self.award(**state)
         if awarded is None:
             return
-        if awarded.user is not None:
-            user_id = awarded.user.pk
         if awarded.level is None:
             assert len(self.levels) == 1
             awarded.level = 1
+        # awarded levels are 1 indexed, for conveineince
+        awarded = awarded.level - 1
+        assert awarded < len(self.levels)
         if (not self.multiple and
-            BadgeAward.objects.filter(user__pk=user_id, slug=self.slug, level=awarded.level)):
+            BadgeAward.objects.filter(user=user, slug=self.slug, level=awarded)):
             return
         extra_kwargs = {}
         if force_timestamp is not None:
             extra_kwargs["awarded_at"] = force_timestamp
-        badge = BadgeAward.objects.create(user_id=user_id, slug=self.slug,
-            level=awarded.level, **extra_kwargs)
+        badge = BadgeAward.objects.create(user=user, slug=self.slug,
+            level=awarded, **extra_kwargs)
         badge_awarded.send(sender=self, badge_award=badge)
-    
+
     def freeze(self, **state):
         return state
 
